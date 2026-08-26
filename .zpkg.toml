@@ -1,0 +1,4 @@
+name = "fanwaave-cli"
+kind = "cli"
+version = "0.1.0"
+
