@@ -8,14 +8,12 @@ allow_unknown = false
 env = "FANWAAVE_API_BASE"
 aliases = ["api-base"]
 type = "string"
-default = "http://127.0.0.1:8080"
-help = "API HTTP base URL."
+help = "API HTTP base URL. Fanwaave runtime default comes from .fanwaave-cfg.toml."
 
 [flags.json]
 env = "FANWAAVE_JSON"
 aliases = ["json"]
 type = "boolean"
-default = false
 help = "Emit JSON."
 
 [commands.health]
@@ -23,7 +21,6 @@ help = "Check API health."
 
 [commands.status]
 help = "Show service status."
-
 
 [flags.env-map-probe]
 env = "ENV_MAP_PROBE"
