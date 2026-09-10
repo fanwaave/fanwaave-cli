@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 use fanwaave_cli::{args, commands, config, error::CliError, flags};
+use fanwaave_lib_core::fanwaave_config::{parse_fanwaave_config, resolve_fanwaave_config};
 
 fn main() {
     if let Err(err) = run() {
@@ -19,7 +20,18 @@ fn run() -> Result<(), CliError> {
         print!("{}", args::help_text());
         return Ok(());
     }
-    let (command, env) = flags::apply_cli_flags()?;
-    let cfg = config::Config::from_env_map(&env)?;
-    commands::dispatch(&cfg, command)
+
+    let applied = flags::apply_cli_flags()?;
+    let fanwaave_text = std::fs::read_to_string(".fanwaave-cfg.toml")
+        .map_err(|error| CliError::Config(format!("cannot read .fanwaave-cfg.toml: {error}")))?;
+    let fanwaave = parse_fanwaave_config(&fanwaave_text)
+        .map_err(|error| CliError::Config(error.to_string()))?;
+    let resolved = resolve_fanwaave_config(
+        &fanwaave,
+        &applied.ambient,
+        &applied.argv_overrides,
+    )
+    .map_err(|error| CliError::Config(error.to_string()))?;
+    let cfg = config::Config::from_sources(&applied.merged, &resolved)?;
+    commands::dispatch(&cfg, applied.command)
 }
