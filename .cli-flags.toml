@@ -1,6 +1,9 @@
 [help]
 url = "https://github.com/fanwaave/fanwaave-cli"
 
+[env]
+load = false
+
 [parse]
 allow_unknown = false
 
@@ -13,7 +16,7 @@ help = "API HTTP base URL. Fanwaave runtime default comes from .fanwaave-cfg.tom
 [flags.json]
 env = "FANWAAVE_JSON"
 aliases = ["json"]
-type = "boolean"
+type = "bool"
 help = "Emit JSON."
 
 [commands.health]
@@ -24,6 +27,6 @@ help = "Show service status."
 
 [flags.env-map-probe]
 env = "ENV_MAP_PROBE"
-long = "env-map-probe"
+aliases = ["env-map-probe"]
 type = "string"
 help = "Runtime environment key ENV_MAP_PROBE."
