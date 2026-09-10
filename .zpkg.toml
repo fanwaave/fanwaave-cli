@@ -1,4 +1,33 @@
+[package]
+org = "fanwaave"
 name = "fanwaave-cli"
-kind = "cli"
 version = "0.1.0"
+description = "CLI for Fanwaave delivery operations"
+license = "MIT"
+language = "rust"
 
+[package.repository]
+vcs = "git"
+url = "https://github.com/fanwaave/fanwaave-cli"
+
+[dependencies]
+
+[build]
+command = "cargo build --release --bin fanwaave"
+outputs = ["target/release/fanwaave"]
+
+[bin]
+fanwaave = "target/release/fanwaave"
+
+[install]
+adapter = "none"
+dir = ".vendor/.zed"
+
+[publish]
+include_readme = true
+tag_format = "v{version}"
+smoke_test = "test -x \"$ZED_PKG_TEST_TARGET/target/release/fanwaave\" && \"$ZED_PKG_TEST_TARGET/target/release/fanwaave\" --help >/dev/null"
+exclude = [".env", ".env.*", ".direnv/**", ".zed/**", ".zed-pack/**", ".vendor/.zed/**", "target/**", "tmp/**", "**/*.log", ".DS_Store"]
+
+[scripts]
+test = "cargo test --all-targets"
