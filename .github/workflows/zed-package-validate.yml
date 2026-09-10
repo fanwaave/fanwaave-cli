@@ -5,12 +5,18 @@ on:
     paths:
       - ".zpkg.toml"
       - ".zpkg.lock"
+      - ".cli-flags.toml"
+      - ".fanwaave-cfg.toml"
+      - "Cargo.toml"
       - ".github/workflows/zed-package-validate.yml"
   push:
     branches: [main]
     paths:
       - ".zpkg.toml"
       - ".zpkg.lock"
+      - ".cli-flags.toml"
+      - ".fanwaave-cfg.toml"
+      - "Cargo.toml"
       - ".github/workflows/zed-package-validate.yml"
 
 permissions:
@@ -24,6 +30,21 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Cross-check package and argv metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .zpkg.toml
+          test -f .zpkg.lock
+          test -f .cli-flags.toml
+          test -f .fanwaave-cfg.toml
+          grep -Fq 'name = "fanwaave-cli"' Cargo.toml
+          grep -Fq 'name = "fanwaave-cli"' .zpkg.toml
+          grep -Fq 'git = "https://github.com/flags-2-env/flags-2-env.git"' Cargo.toml
+          grep -Fq 'contract = ".cli-flags.toml"' .fanwaave-cfg.toml
+          grep -Fq 'load = false' .cli-flags.toml
+          grep -Fq 'allow_unknown = false' .cli-flags.toml
+          ! grep -Fq 'github.com/ORESoftware/flags-2-env' Cargo.toml .zpkg.toml .cli-flags.toml .fanwaave-cfg.toml
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: zed-pkg/zed-cli
