@@ -8,7 +8,7 @@ load = false
 allow_unknown = false
 
 [flags.api-base]
-env = "FANWAAVE_API_BASE"
+env = "FANWAAVE_API_BASE_URL"
 aliases = ["api-base"]
 type = "string"
 help = "API HTTP base URL. Fanwaave runtime default comes from .fanwaave-cfg.toml."
