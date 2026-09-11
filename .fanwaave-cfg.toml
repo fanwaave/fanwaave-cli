@@ -13,7 +13,7 @@ api_base_url_binding = "api_base_url"
 
 [[env]]
 name = "api_base_url"
-key = "FANWAAVE_API_BASE"
+key = "FANWAAVE_API_BASE_URL"
 kind = "url"
 required = false
 secret = false

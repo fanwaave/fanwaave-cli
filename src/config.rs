@@ -63,17 +63,20 @@ mod tests {
     fn resolved_fanwaave_value_and_cli_json_flag_compose() {
         let fanwaave = parse_fanwaave_config(CFG).expect("tracked config parses");
         let ambient = BTreeMap::from([(
-            "FANWAAVE_API_BASE".to_owned(),
+            "FANWAAVE_API_BASE_URL".to_owned(),
             "https://ambient.example".to_owned(),
         )]);
         let argv = BTreeMap::from([(
-            "FANWAAVE_API_BASE".to_owned(),
+            "FANWAAVE_API_BASE_URL".to_owned(),
             "https://argv.example".to_owned(),
         )]);
         let resolved = resolve_fanwaave_config(&fanwaave, &ambient, &argv)
             .expect("tracked config resolves");
         let merged = BTreeMap::from([
-            ("FANWAAVE_API_BASE".to_owned(), "https://argv.example".to_owned()),
+            (
+                "FANWAAVE_API_BASE_URL".to_owned(),
+                "https://argv.example".to_owned(),
+            ),
             ("FANWAAVE_JSON".to_owned(), "true".to_owned()),
         ]);
         let config = Config::from_sources(&merged, &resolved).expect("CLI config resolves");

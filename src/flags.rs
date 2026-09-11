@@ -102,15 +102,20 @@ mod tests {
         let applied = apply_cli_flags_from(
             vec!["cli".into(), "health".into()],
             EnvMap::from([(
-                "FANWAAVE_API_BASE".into(),
+                "FANWAAVE_API_BASE_URL".into(),
                 "https://ambient.example".into(),
             )]),
             &config_path(),
         )
         .expect("valid flags");
-        assert!(applied.argv_overrides.get("FANWAAVE_API_BASE").is_none());
+        assert!(
+            applied
+                .argv_overrides
+                .get("FANWAAVE_API_BASE_URL")
+                .is_none()
+        );
         assert_eq!(
-            value(&applied.merged, "FANWAAVE_API_BASE"),
+            value(&applied.merged, "FANWAAVE_API_BASE_URL"),
             Some("https://ambient.example")
         );
     }
@@ -124,20 +129,39 @@ mod tests {
                 "--api-base=https://argv.example".into(),
             ],
             EnvMap::from([(
-                "FANWAAVE_API_BASE".into(),
+                "FANWAAVE_API_BASE_URL".into(),
                 "https://ambient.example".into(),
             )]),
             &config_path(),
         )
         .expect("valid flags");
         assert_eq!(
-            value(&applied.argv_overrides, "FANWAAVE_API_BASE"),
+            value(&applied.argv_overrides, "FANWAAVE_API_BASE_URL"),
             Some("https://argv.example")
         );
         assert_eq!(
-            value(&applied.merged, "FANWAAVE_API_BASE"),
+            value(&applied.merged, "FANWAAVE_API_BASE_URL"),
             Some("https://argv.example")
         );
+    }
+
+    #[test]
+    fn generated_env_contracts_track_cli_authority() {
+        let artifacts = [
+            include_str!("../generated/rust/env.rs"),
+            include_str!("../generated/rust/runtime.rs"),
+            include_str!("../generated/typescript/env.ts"),
+            include_str!("../generated/typescript/runtime.ts"),
+            include_str!("../generated/dart/env.dart"),
+            include_str!("../generated/dart/runtime.dart"),
+            include_str!("../generated/gleam/env.gleam"),
+            include_str!("../generated/gleam/runtime.gleam"),
+        ];
+        for artifact in artifacts {
+            assert!(artifact.contains("FANWAAVE_API_BASE_URL"));
+            assert!(!artifact.contains("\"FANWAAVE_API_BASE\""));
+            assert!(!artifact.contains("'FANWAAVE_API_BASE'"));
+        }
     }
 
     #[test]
