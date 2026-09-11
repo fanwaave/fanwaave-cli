@@ -3,7 +3,7 @@
 final class CliEnv {
   const CliEnv._();
 
-  static const String apiBase = 'FANWAAVE_API_BASE';
+  static const String apiBase = 'FANWAAVE_API_BASE_URL';
   static const String apiBaseDefault = 'http://127.0.0.1:8080';
   static const String envMapProbe = 'ENV_MAP_PROBE';
   static const String json = 'FANWAAVE_JSON';
