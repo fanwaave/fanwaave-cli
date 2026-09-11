@@ -9,7 +9,7 @@ export interface CliEnvValues {
 /** Pure: resolve values from an explicit lookup. */
 export function loadFrom(lookup: (key: string) => string | undefined): CliEnvValues {
   return {
-    api_base: nonEmpty(lookup("FANWAAVE_API_BASE")) ?? "http://127.0.0.1:8080",
+    api_base: nonEmpty(lookup("FANWAAVE_API_BASE_URL")) ?? "http://127.0.0.1:8080",
     env_map_probe: nonEmpty(lookup("ENV_MAP_PROBE")),
     json: parseBool(lookup("FANWAAVE_JSON"), false),
   };
@@ -150,7 +150,7 @@ export function loadDotenvFiles(files: readonly string[]): Record<string, string
   } catch {
     return {};
   }
-  return files.reduce<Record<string, string>>((acc, path) => {
+  return files.reduce<Record<string, string>>({}, (acc, path) => {
     try {
       return { ...acc, ...parseDotenv(fs!.readFileSync(path, "utf8")) };
     } catch {
@@ -183,8 +183,8 @@ export function loadEnvMap(
   flags: Record<string, string | undefined> = {},
 ): Record<string, string> {
   const out: Record<string, string> = {};
-  const api_base = pick(["FANWAAVE_API_BASE"], ["flags", "env_shell", "env_file"], shell, dotenv, flags, "http://127.0.0.1:8080");
-  if (api_base !== undefined) out["FANWAAVE_API_BASE"] = api_base;
+  const api_base = pick(["FANWAAVE_API_BASE_URL"], ["flags", "env_shell", "env_file"], shell, dotenv, flags, "http://127.0.0.1:8080");
+  if (api_base !== undefined) out["FANWAAVE_API_BASE_URL"] = api_base;
   const env_map_probe = pick(["ENV_MAP_PROBE"], ["flags", "env_shell", "env_file"], shell, dotenv, flags, undefined);
   if (env_map_probe !== undefined) out["ENV_MAP_PROBE"] = env_map_probe;
   const json = pick(["FANWAAVE_JSON"], ["flags", "env_shell", "env_file"], shell, dotenv, flags, "false");

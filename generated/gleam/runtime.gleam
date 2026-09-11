@@ -13,7 +13,7 @@ pub type CliEnvValues {
 /// Pure: resolve values from an explicit lookup.
 pub fn load_from(lookup: fn(String) -> Option(String)) -> CliEnvValues {
   CliEnvValues(
-    api_base: nonempty_or(lookup("FANWAAVE_API_BASE"), "http://127.0.0.1:8080"),
+    api_base: nonempty_or(lookup("FANWAAVE_API_BASE_URL"), "http://127.0.0.1:8080"),
     env_map_probe: nonempty(lookup("ENV_MAP_PROBE")),
     json: nonempty_or(lookup("FANWAAVE_JSON"), "false"),
   )

@@ -13,7 +13,7 @@ final class CliEnvValues {
 /// Pure: resolve values from an explicit lookup.
 CliEnvValues loadFrom(String? Function(String key) lookup) {
   return CliEnvValues(
-    apiBase: _nonEmpty(lookup('FANWAAVE_API_BASE')) ?? 'http://127.0.0.1:8080',
+    apiBase: _nonEmpty(lookup('FANWAAVE_API_BASE_URL')) ?? 'http://127.0.0.1:8080',
     envMapProbe: _nonEmpty(lookup('ENV_MAP_PROBE')),
     json: _parseBool(lookup('FANWAAVE_JSON'), false),
   );
@@ -164,8 +164,8 @@ Map<String, String> loadEnvMap(
   Map<String, String> flags = const {},
 ]) {
   final out = <String, String>{};
-  final apiBase = pick(['FANWAAVE_API_BASE'], ['flags', 'env_shell', 'env_file'], shell, dotenv, flags, 'http://127.0.0.1:8080');
-  if (apiBase != null) out['FANWAAVE_API_BASE'] = apiBase;
+  final apiBase = pick(['FANWAAVE_API_BASE_URL'], ['flags', 'env_shell', 'env_file'], shell, dotenv, flags, 'http://127.0.0.1:8080');
+  if (apiBase != null) out['FANWAAVE_API_BASE_URL'] = apiBase;
   final envMapProbe = pick(['ENV_MAP_PROBE'], ['flags', 'env_shell', 'env_file'], shell, dotenv, flags, null);
   if (envMapProbe != null) out['ENV_MAP_PROBE'] = envMapProbe;
   final json = pick(['FANWAAVE_JSON'], ['flags', 'env_shell', 'env_file'], shell, dotenv, flags, 'false');

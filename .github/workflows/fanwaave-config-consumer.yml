@@ -1,0 +1,26 @@
+name: fanwaave-config-consumer
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust 1.88.0
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal
+          rustup default 1.88.0
+          rustc --version
+          cargo --version
+      - name: Test CLI, flags-2-env precedence, and Fanwaave config resolution
+        run: cargo test --all-targets
