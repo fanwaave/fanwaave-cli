@@ -12,7 +12,7 @@ pub struct CliEnvValues {
 /// Pure: resolve values from an explicit lookup.
 pub fn load_from(lookup: impl Fn(&str) -> Option<String>) -> CliEnvValues {
     CliEnvValues {
-        api_base: lookup("FANWAAVE_API_BASE").filter(|value| !value.is_empty()).unwrap_or_else(|| "http://127.0.0.1:8080".to_string()),
+        api_base: lookup("FANWAAVE_API_BASE_URL").filter(|value| !value.is_empty()).unwrap_or_else(|| "http://127.0.0.1:8080".to_string()),
         env_map_probe: lookup("ENV_MAP_PROBE").filter(|value| !value.is_empty()),
         json: parse_bool(lookup("FANWAAVE_JSON"), false),
     }
@@ -164,9 +164,9 @@ pub fn load_env_map(
     flags: &std::collections::BTreeMap<String, String>,
 ) -> Result<std::collections::BTreeMap<String, String>, MissingEnv> {
     let mut out = std::collections::BTreeMap::new();
-    let api_base = pick(&["FANWAAVE_API_BASE"], &["flags", "env_shell", "env_file"], shell, dotenv, flags, Some("http://127.0.0.1:8080"));
+    let api_base = pick(&["FANWAAVE_API_BASE_URL"], &["flags", "env_shell", "env_file"], shell, dotenv, flags, Some("http://127.0.0.1:8080"));
     if let Some(value) = api_base {
-        out.insert("FANWAAVE_API_BASE".to_string(), value);
+        out.insert("FANWAAVE_API_BASE_URL".to_string(), value);
     }
     let env_map_probe = pick(&["ENV_MAP_PROBE"], &["flags", "env_shell", "env_file"], shell, dotenv, flags, None);
     if let Some(value) = env_map_probe {
