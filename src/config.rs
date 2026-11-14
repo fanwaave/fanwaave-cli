@@ -50,18 +50,21 @@ mod tests {
     const CFG: &str = include_str!("../.fanwaave-cfg.toml");
 
     #[test]
-    fn domain_default_supplies_api_base_when_env_and_argv_are_silent() {
-        let fanwaave = parse_fanwaave_config(CFG).expect("tracked config parses");
+    fn domain_default_supplies_api_base_when_env_and_argv_are_silent() -> Result<(), CliError> {
+        let fanwaave = parse_fanwaave_config(CFG)
+            .map_err(|_| CliError::Config("tracked config parsing failed".into()))?;
         let resolved = resolve_fanwaave_config(&fanwaave, &BTreeMap::new(), &BTreeMap::new())
-            .expect("tracked config resolves");
-        let config = Config::from_sources(&BTreeMap::new(), &resolved).expect("CLI config resolves");
+            .map_err(|_| CliError::Config("tracked config resolution failed".into()))?;
+        let config = Config::from_sources(&BTreeMap::new(), &resolved)?;
         assert_eq!(config.api_base, "http://127.0.0.1:8080");
         assert!(!config.json);
+        Ok(())
     }
 
     #[test]
-    fn resolved_fanwaave_value_and_cli_json_flag_compose() {
-        let fanwaave = parse_fanwaave_config(CFG).expect("tracked config parses");
+    fn resolved_fanwaave_value_and_cli_json_flag_compose() -> Result<(), CliError> {
+        let fanwaave = parse_fanwaave_config(CFG)
+            .map_err(|_| CliError::Config("tracked config parsing failed".into()))?;
         let ambient = BTreeMap::from([(
             "FANWAAVE_API_BASE_URL".to_owned(),
             "https://ambient.example".to_owned(),
@@ -71,7 +74,7 @@ mod tests {
             "https://argv.example".to_owned(),
         )]);
         let resolved = resolve_fanwaave_config(&fanwaave, &ambient, &argv)
-            .expect("tracked config resolves");
+            .map_err(|_| CliError::Config("tracked config resolution failed".into()))?;
         let merged = BTreeMap::from([
             (
                 "FANWAAVE_API_BASE_URL".to_owned(),
@@ -79,8 +82,9 @@ mod tests {
             ),
             ("FANWAAVE_JSON".to_owned(), "true".to_owned()),
         ]);
-        let config = Config::from_sources(&merged, &resolved).expect("CLI config resolves");
+        let config = Config::from_sources(&merged, &resolved)?;
         assert_eq!(config.api_base, "https://argv.example");
         assert!(config.json);
+        Ok(())
     }
 }
