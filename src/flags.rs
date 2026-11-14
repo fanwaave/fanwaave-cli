@@ -41,11 +41,14 @@ pub fn parse_cli_flags(argv: &[String], config_path: &Path) -> Result<(Command, 
     if !parsed.errors.is_empty() {
         return Err(CliError::Usage("invalid command-line value".into()));
     }
-    let command = match parsed.command.as_str() {
-        "" | "help" => Command::Help,
-        "health" => Command::Health,
-        "status" => Command::Status,
-        _ => return Err(CliError::Usage("unknown command".into())),
+    let command = if parsed.command.is_empty() || parsed.command == "help" {
+        Command::Help
+    } else if parsed.command == "health" {
+        Command::Health
+    } else if parsed.command == "status" {
+        Command::Status
+    } else {
+        return Err(CliError::Usage("unknown command".into()));
     };
 
     // `flags` contains TOML defaults and can incorrectly shadow a real process
