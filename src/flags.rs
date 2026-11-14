@@ -87,21 +87,22 @@ mod tests {
     }
 
     #[test]
-    fn health_command_merges_without_mutating_process_environment() {
+    fn health_command_merges_without_mutating_process_environment() -> Result<(), CliError> {
         let before = std::env::var_os("ENV_MAP_PROBE");
         let applied = apply_cli_flags_from(
             vec!["cli".into(), "health".into()],
             EnvMap::from([("ENV_MAP_PROBE".into(), "keep".into())]),
             &config_path(),
         )
-        .expect("valid flags");
+        ?;
         assert_eq!(applied.command, Command::Health);
         assert_eq!(value(&applied.merged, "ENV_MAP_PROBE"), Some("keep"));
         assert_eq!(std::env::var_os("ENV_MAP_PROBE"), before);
+        Ok(())
     }
 
     #[test]
-    fn ambient_env_beats_toml_default_when_argv_is_silent() {
+    fn ambient_env_beats_toml_default_when_argv_is_silent() -> Result<(), CliError> {
         let applied = apply_cli_flags_from(
             vec!["cli".into(), "health".into()],
             EnvMap::from([(
@@ -110,7 +111,7 @@ mod tests {
             )]),
             &config_path(),
         )
-        .expect("valid flags");
+        ?;
         assert!(
             applied
                 .argv_overrides
@@ -121,10 +122,11 @@ mod tests {
             value(&applied.merged, "FANWAAVE_API_BASE_URL"),
             Some("https://ambient.example")
         );
+        Ok(())
     }
 
     #[test]
-    fn explicit_argv_beats_ambient_env() {
+    fn explicit_argv_beats_ambient_env() -> Result<(), CliError> {
         let applied = apply_cli_flags_from(
             vec![
                 "cli".into(),
@@ -137,7 +139,7 @@ mod tests {
             )]),
             &config_path(),
         )
-        .expect("valid flags");
+        ?;
         assert_eq!(
             value(&applied.argv_overrides, "FANWAAVE_API_BASE_URL"),
             Some("https://argv.example")
@@ -146,6 +148,7 @@ mod tests {
             value(&applied.merged, "FANWAAVE_API_BASE_URL"),
             Some("https://argv.example")
         );
+        Ok(())
     }
 
     #[test]
