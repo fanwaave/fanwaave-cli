@@ -25,24 +25,19 @@ pub fn parse_cli_flags(argv: &[String], config_path: &Path) -> Result<(Command, 
     })?;
     let parsed = parser
         .parse_structured(argv, Some(config_path))
-        .map_err(|error| CliError::Config(format!("flags-2-env parse failed: {error}")))?;
+        // Parser errors may contain raw flag values (including credentials).
+        .map_err(|_| CliError::Config("flags-2-env parse failed".into()))?;
     if !parsed.unknown_options.is_empty() {
-        return Err(CliError::Usage(format!(
-            "unknown command-line option(s): {}",
-            parsed.unknown_options.join(", ")
-        )));
+        return Err(CliError::Usage("unknown command-line option".into()));
     }
     if !parsed.errors.is_empty() {
-        return Err(CliError::Usage(format!(
-            "invalid command-line value(s): {}",
-            parsed.errors.join("; ")
-        )));
+        return Err(CliError::Usage("invalid command-line value".into()));
     }
     let command = match parsed.command.as_str() {
         "" | "help" => Command::Help,
         "health" => Command::Health,
         "status" => Command::Status,
-        other => return Err(CliError::Usage(format!("unknown command {other}"))),
+        _ => return Err(CliError::Usage("unknown command".into())),
     };
 
     // `flags` contains TOML defaults and can incorrectly shadow a real process
@@ -178,6 +173,18 @@ mod tests {
         )
         .is_err());
         assert_eq!(std::env::var_os("ENV_MAP_PROBE"), before);
+    }
+
+    #[test]
+    fn parser_errors_do_not_echo_secret_like_cli_values() {
+        let sentinel = "DO_NOT_ECHO_TOKEN_SECRET";
+        for argv in [
+            vec!["cli".into(), "health".into(), format!("--unknown={sentinel}")],
+            vec!["cli".into(), sentinel.into()],
+        ] {
+            let error = parse_cli_flags(&argv, &config_path()).expect_err("invalid invocation");
+            assert!(!error.to_string().contains(sentinel));
+        }
     }
 
     #[test]
