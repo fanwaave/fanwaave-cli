@@ -16,6 +16,14 @@ pub struct AppliedCliFlags {
 }
 
 pub fn parse_cli_flags(argv: &[String], config_path: &Path) -> Result<(Command, EnvMap), CliError> {
+    // flags-2-env may interpret an unknown leading bare argument as an
+    // empty/help command. Reject it before structured flag parsing, without
+    // including user-controlled input in the error.
+    if let Some(first) = argv.get(1) {
+        if !first.starts_with('-') && !matches!(first.as_str(), "health" | "status" | "help") {
+            return Err(CliError::Usage("unknown command".into()));
+        }
+    }
     let config_path = config_path
         .to_str()
         .ok_or_else(|| CliError::Config(".cli-flags.toml path is not valid UTF-8".into()))?;
